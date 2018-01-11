@@ -28,13 +28,13 @@ def __gen_extends( cls_full_name, super_clses_full ):
 	return 'cls->extends<%s, %s>();\n' %( cls_full_name, ",".join( super_clses_full ) )
 
 def __gen_nonmember_function( cls_full_name, func_name ):
-	return 'cls->registerFunction(%s, "%s")\n' % ( "::".join((cls_full_name, func_name)), func_name )
+	return 'cls->registerFunction(%s, "%s");\n' % ( "::".join((cls_full_name, func_name)), func_name )
 
 def __gen_member_function( cls_full_name, func_name ):
-	return 'cls->registerFunction(&%s, "%s")\n' % ( "::".join((cls_full_name, func_name)), func_name )
+	return 'cls->registerFunction(&%s, "%s");\n' % ( "::".join((cls_full_name, func_name)), func_name )
 
 def __gen_nonmember_variable( cls_full_name, vari_name ):
-	return 'cls->registerVariable(&%s, "%s")\n' % ( "::".join((cls_full_name, vari_name)), vari_name )
+	return 'cls->registerVariable(&%s, "%s");\n' % ( "::".join((cls_full_name, vari_name)), vari_name )
 
 def __gen_member_variable( cls_full_name, vari_name ):
 	return __gen_nonmember_variables( cls_full_name, vari_name )
@@ -42,12 +42,9 @@ def __gen_member_variable( cls_full_name, vari_name ):
 
 
 
-def gen_cls_codes( ns_name, cls_full_name, super_clses_full, nonmember_funcs, member_funcs, nonmember_varis, member_varis ):
-	la_ns_name = ns_name.replace( "::", "." )
+def gen_cls_codes( codes_list, ns_name, cls_full_name, super_clses_full, nonmember_funcs, member_funcs, nonmember_varis, member_varis ):
 	la_cls_full_name = cls_full_name.replace( "::", "." )
 
-	codes_list = []
-	codes_list.append( 'auto ns = LuaAdapterEnvironment::getInstance().getNamespace("%s");\n' % la_ns_name )
 	codes_list.append( 'ns->begin();{\n' );
 	codes_list.append( '    ns->registerClass("%s", typeid(%s));\n' % (la_cls_full_name, cls_full_name) );
 	codes_list.append( '    auto cls = ns->getClass("%s");\n' % la_cls_full_name );
@@ -69,8 +66,6 @@ def gen_cls_codes( ns_name, cls_full_name, super_clses_full, nonmember_funcs, me
 	codes_list.append( '    cls->end();\n' );
 	codes_list.append( '}ns->end();\n' );
 
-	return codes_list
-
 def __read_file_content( fpath ):
     f = open( fpath )
     if not f:
@@ -84,6 +79,12 @@ def gen_by_config( fPath ):
 	fJson = json.loads( fContent )
 	nsInfo = fJson["namespace"]
 	ns_name = nsInfo["namespace_name"]
+	la_ns_name = ns_name.replace( "::", "." )
+
+	codes_list = []
+	codes_list.append( 'void lua_support_register_auto_meteor() {\n' )
+	codes_list.append( 'auto ns = LuaAdapterEnvironment::getInstance().getNamespace("%s");\n' % la_ns_name )
+
 	for clsInfo in fJson["classes"]:
 		cls_name = clsInfo["class_name"]
 		cls_full_name = "::".join( [ns_name, cls_name] )
@@ -103,11 +104,15 @@ def gen_by_config( fPath ):
 		nonmember_varis = clsInfo.has_key("nonmember_variables") and clsInfo["nonmember_variables"] or ()
 		member_varis = clsInfo.has_key("member_variables") and clsInfo["member_variables"] or ()
 
-		codes_list = gen_cls_codes( ns_name, cls_full_name, super_clses_full, 
+		gen_cls_codes( codes_list, ns_name, cls_full_name, super_clses_full, 
 		  nonmember_funcs, member_funcs, nonmember_varis, member_varis )
-		for code in codes_list:
-			print( code )
-
+	#end for 
+	codes_list.append( '}\n' )
+	f = open( "result.cpp", "w+" )
+	for code in codes_list:
+		f.write( code )
+	f.flush()
+	f.close()
 
 if "__main__" == __name__:
 	fPath = sys.argv[1]

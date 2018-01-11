@@ -2,7 +2,8 @@
 	"namespace": {
 		"namespace_name": "lcx"
 	},
-	"classes": [{
+	"classes": [
+		{
 			"class_name": "Ref",
 			"member_functions": ["retain", "release", "autoRelease", "getReferenceCount"]
 		},
@@ -10,8 +11,45 @@
 			"class_name": "Scheduler",
 			"extends": ["Ref"],
 			"member_functions": ["setTimeScale", "schedule", "scheduleUpdate", "scheduleWithDeltaTime", "scheduleOnce",
-				"unschedule", "unscheduleAllForTarget"
-			]
+				"unschedule", "unscheduleAllForTarget" ]
+		},
+		{
+			"class_name": "Node",
+			"extends": ["Ref"],
+			"nonmember_functions" : [ "create" ],
+			"member_functions": [ "addChild", "removeChild", "removeChildByName", "removeChildByTag", "removeFromParent",
+				"findChildByName", "findChildByTag", "getParent", "getName", "getTag", "setName", "setTag", "setPosition", "setPosition2D",
+				"setScale", "setRotation", "setAnchorPoint", "setAnchorPoint2D", "setVisible", "setLocalZOrder", "setGlobalZOrder", "setGLProgramState",
+				"getPosition", "getScale", "getRotation", "getAnchorPoint", "isVisible", "getLocalZOrder", "getGlobalZOrder", "convertToWorldSpace",
+				"convertToLocalSpace"]
+		},
+		{
+			"class_name": "Scene",
+			"extends": ["Node"],
+			"nonmember_functions" : [ "create" ],
+			"member_functions": [ "setDefaultCamera" ]
+		},
+		{
+			"class_name": "Sprite2D",
+			"extends": ["Node"],
+			"member_functions": [ "setColor", "setBlendFunc", "setAnchorPointInPercentOfTexture" ]
+		},
+		{
+			"class_name": "Director",
+			"extends": ["Ref"],
+			"nonmember_functions" : [ "getInstance" ],
+			"member_functions": [ "runWithScene", "pushScene", "getCurScene", "getFPS", "setFPS", "getScheduler", "addCamera", "removeCamera" ]
+		},
+		{
+			"class_name": "Camera",
+			"extends": ["Ref"],
+			"member_functions": [ "lookAt", "getPosition", "setPosition", "setViewport", "getViewport" ]
+		},
+		{
+			"class_name": "OrthotropicCamera",
+			"extends": ["Camera"],
+			"nonmember_functions" : [ "create" ],
+			"member_functions": [ "setZone" ]
 		}
 	]
 }
