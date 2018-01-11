@@ -1,0 +1,17 @@
+{
+	"namespace": {
+		"namespace_name": "lcx"
+	},
+	"classes": [{
+			"class_name": "Ref",
+			"member_functions": ["retain", "release", "autoRelease", "getReferenceCount"]
+		},
+		{
+			"class_name": "Scheduler",
+			"extends": ["Ref"],
+			"member_functions": ["setTimeScale", "schedule", "scheduleUpdate", "scheduleWithDeltaTime", "scheduleOnce",
+				"unschedule", "unscheduleAllForTarget"
+			]
+		}
+	]
+}
